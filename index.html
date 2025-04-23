@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Text Overlay</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        canvas { border: 1px solid #000; }
+        .debug-controls { margin: 20px; display: none; }
+        .controls { margin: 20px; }
+        input, button { margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Image Text Overlay</h1>
+    <canvas id="canvas" width="1024" height="1024"></canvas>
+    
+    <div class="controls">
+        <input type="text" id="textInput" placeholder="Enter text" value="X1000">
+        <input type="color" id="textColor" value="#000000">
+        <button onclick="overlayText()">Overlay Text</button>
+        <button onclick="downloadImage()">Download Image</button>
+    </div>
+
+    <div class="debug-controls" id="debugControls">
+        <h3>Debug Mode</h3>
+        <label>X Position: <input type="range" id="xPos" min="0" max="1024" value="100" oninput="updateText()"></label><br>
+        <label>Y Position: <input type="range" id="yPos" min="0" max="1024" value="100" oninput="updateText()"></label><br>
+        <label>Font Size: <input type="range" id="fontSize" min="10" max="100" value="40" oninput="updateText()"></label><br>
+        <label>Global Opacity: <input type="range" id="globalOpacity" min="0" max="1" step="0.1" value="0.7" oninput="updateText()"></label><br>
+        <p>Current Settings: <code id="settingsOutput"></code></p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let image = new Image();
+        let textSettings = { x: 565, y: 119, fontSize: 29, color: '#000000', text: 'X1000', globalOpacity: 0.7 };
+
+        // Check for debug mode in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const isDebug = urlParams.get('debug') === 'true';
+        if (isDebug) {
+            document.getElementById('debugControls').style.display = 'block';
+            document.getElementById('xPos').value = textSettings.x;
+            document.getElementById('yPos').value = textSettings.y;
+            document.getElementById('fontSize').value = textSettings.fontSize;
+            document.getElementById('globalOpacity').value = textSettings.globalOpacity;
+        }
+
+        // Load the fixed template image
+        image.src = 'template.png';
+        image.onload = () => {
+            if (image.width === 1024 && image.height === 1024) {
+                drawCanvas();
+            } else {
+                alert('Template image must be 1024x1024 pixels.');
+            }
+        };
+        image.onerror = () => {
+            alert('Failed to load template image. Ensure template.png exists on the server.');
+        };
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Set global opacity for both image and text
+            ctx.globalAlpha = textSettings.globalOpacity;
+            ctx.drawImage(image, 0, 0);
+            ctx.font = `${textSettings.fontSize}px Gunplay`;
+            ctx.fillStyle = textSettings.color;
+            ctx.fillText(textSettings.text, textSettings.x, textSettings.y);
+            // Reset globalAlpha to default (optional, for future operations)
+            ctx.globalAlpha = 1.0;
+        }
+
+        function overlayText() {
+            textSettings.text = document.getElementById('textInput').value || 'Sample Text';
+            textSettings.color = document.getElementById('textColor').value;
+            drawCanvas();
+        }
+
+        function updateText() {
+            if (isDebug) {
+                textSettings.x = parseInt(document.getElementById('xPos').value);
+                textSettings.y = parseInt(document.getElementById('yPos').value);
+                textSettings.fontSize = parseInt(document.getElementById('fontSize').value);
+                textSettings.globalOpacity = parseFloat(document.getElementById('globalOpacity').value);
+                textSettings.text = document.getElementById('textInput').value || 'Sample Text';
+                textSettings.color = document.getElementById('textColor').value;
+                drawCanvas();
+                document.getElementById('settingsOutput').textContent = 
+                    `x: ${textSettings.x}, y: ${textSettings.y}, fontSize: ${textSettings.fontSize}, globalOpacity: ${textSettings.globalOpacity}`;
+            }
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'image_with_text.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
