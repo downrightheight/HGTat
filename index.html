@@ -18,7 +18,6 @@
     
     <div class="controls">
         <input type="text" id="textInput" placeholder="Enter text" value="X1000">
-        <input type="color" id="textColor" value="#000000">
         <button onclick="overlayText()">Overlay Text</button>
         <button onclick="downloadImage()">Download Image</button>
     </div>
@@ -76,7 +75,7 @@
 
         function overlayText() {
             textSettings.text = document.getElementById('textInput').value || 'Sample Text';
-            textSettings.color = document.getElementById('textColor').value;
+            textSettings.color = '#000000';
             drawCanvas();
         }
 
