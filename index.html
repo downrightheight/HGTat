@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HellGate Meat Tattoo Generator</title>
+    <title>Image Text Overlay</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         canvas { border: 1px solid #000; }
@@ -13,12 +13,12 @@
     </style>
 </head>
 <body>
-    <h1>HellGate Meat Tattoo Generator</h1>
+    <h1>Hellgate Meat Tattoo Generator</h1>
     <canvas id="canvas" width="1024" height="1024"></canvas>
     
     <div class="controls">
         <input type="text" id="textInput" placeholder="Enter text" value="X1000">
-        
+        <input type="color" id="textColor" value="#000000">
         <button onclick="overlayText()">Overlay Text</button>
         <button onclick="downloadImage()">Download Image</button>
     </div>
