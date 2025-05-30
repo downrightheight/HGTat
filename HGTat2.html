@@ -63,8 +63,8 @@
         <div class="debug-controls" id="debugControls">
             <h3>Debug Mode</h3>
             <h4>Image Settings</h4>
-            <label>X Offset: <input type="range" id="imageXOffset" min="-512" max="512" value="-512" oninput="updateText()"></label><br>
-            <label>Y Offset: <input type="range" id="imageYOffset" min="-512" max="512" value="-512" oninput="updateText()"></label><br>
+            <label>X Offset: <input type="range" id="imageXOffset" min="-512" max="512" value="0" oninput="updateText()"></label><br>
+            <label>Y Offset: <input type="range" id="imageYOffset" min="-512" max="512" value="0" oninput="updateText()"></label><br>
             
             <h4>Foreword Settings</h4>
             <label>X Position: <input type="range" id="forewordXPos" min="0" max="1024" value="590" oninput="updateText()"></label><br>
@@ -108,101 +108,6 @@
         const ctx = canvas.getContext('2d');
         let image = new Image();
         let textSettings = {
-            image: { xOffset: -512, yOffset: -512 }, // Default: image centered on 1024x1024 canvas
+            image: { xOffset: 0, yOffset: 0 }, // Default: image at top-left (0, 0)
             foreword: { x: 590, y: 88, fontSize: 25, color: '#000000', text: 'PRE' },
-            meatNumber: { x: 565, y: 119, fontSize: 29, color: '#000000', text: 'X1000' },
-            endWord: { x: 551, y: 140, fontSize: 16, color: '#000000', text: 'POST' },
-            globalOpacity: 0.7
-        };
-        const defaultMeatNumber = { x: 565, y: 119 }; // Default MEAT Number position for offset calculation
-
-        // Check for debug mode in URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const isDebug = urlParams.get('debug') === 'true';
-        if (isDebug) {
-            document.getElementById('debugControls').style.display = 'block';
-            document.getElementById('imageXOffset').value = textSettings.image.xOffset;
-            document.getElementById('imageYOffset').value = textSettings.image.yOffset;
-            document.getElementById('forewordXPos').value = textSettings.foreword.x;
-            document.getElementById('forewordYPos').value = textSettings.foreword.y;
-            document.getElementById('forewordFontSize').value = textSettings.foreword.fontSize;
-            document.getElementById('meatNumberXPos').value = textSettings.meatNumber.x;
-            document.getElementById('meatNumberYPos').value = textSettings.meatNumber.y;
-            document.getElementById('meatNumberFontSize').value = textSettings.meatNumber.fontSize;
-            document.getElementById('endWordXPos').value = textSettings.endWord.x;
-            document.getElementById('endWordYPos').value = textSettings.endWord.y;
-            document.getElementById('endWordFontSize').value = textSettings.endWord.fontSize;
-            document.getElementById('globalOpacity').value = textSettings.globalOpacity;
-        }
-
-        // Load the fixed template image
-        image.src = 'template.png';
-        image.onload = () => {
-            if (image.width === 1024 && image.height === 1024) {
-                drawCanvas();
-            } else {
-                alert('Template image must be 1024x1024 pixels.');
-            }
-        };
-        image.onerror = () => {
-            alert('Failed to load template image. Ensure template.png exists on the server.');
-        };
-
-        function drawCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.globalAlpha = textSettings.globalOpacity;
-            // Draw image with X and Y offsets
-            ctx.drawImage(image, textSettings.image.xOffset, textSettings.image.yOffset);
-            
-            // Draw Foreword (centered)
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.font = `${textSettings.foreword.fontSize}px Gunplay`;
-            ctx.fillStyle = textSettings.foreword.color;
-            ctx.fillText(textSettings.foreword.text, textSettings.foreword.x, textSettings.foreword.y);
-            
-            // Draw MEAT Number (left-aligned, as original)
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            ctx.font = `${textSettings.meatNumber.fontSize}px Gunplay`;
-            ctx.fillStyle = textSettings.meatNumber.color;
-            ctx.fillText(textSettings.meatNumber.text, textSettings.meatNumber.x, textSettings.meatNumber.y);
-            
-            // Draw End Word (centered)
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.font = `${textSettings.endWord.fontSize}px Gunplay`;
-            ctx.fillStyle = textSettings.endWord.color;
-            ctx.fillText(textSettings.endWord.text, textSettings.endWord.x, textSettings.endWord.y);
-            
-            ctx.globalAlpha = 1.0;
-        }
-
-        function overlayText() {
-            textSettings.foreword.text = document.getElementById('forewordInput').value || 'PRE';
-            textSettings.meatNumber.text = document.getElementById('meatNumberInput').value || 'X1000';
-            textSettings.endWord.text = document.getElementById('endWordInput').value || 'POST';
-            textSettings.foreword.color = '#000000';
-            textSettings.meatNumber.color = '#000000';
-            textSettings.endWord.color = '#000000';
-            drawCanvas();
-        }
-
-        function updateText() {
-            if (isDebug) {
-                // Update MEAT Number position
-                textSettings.meatNumber.x = parseInt(document.getElementById('meatNumberXPos').value);
-                textSettings.meatNumber.y = parseInt(document.getElementById('meatNumberYPos').value);
-                
-                // Calculate image offset based on MEAT Number's deviation from default
-                const deltaX = textSettings.meatNumber.x - defaultMeatNumber.x;
-                const deltaY = textSettings.meatNumber.y - defaultMeatNumber.y;
-                textSettings.image.xOffset = -512 + deltaX; // Center (512,512) plus MEAT Number offset
-                textSettings.image.yOffset = -512 + deltaY;
-                
-                // Update image offset sliders to reflect synchronized values
-                document.getElementById('imageXOffset').value = textSettings.image.xOffset;
-                document.getElementById('imageYOffset').value = textSettings.image.yOffset;
-
-                // Update other settings
-                textSettings.image.xOffset = parseInt(document.getElementById('imageXOffset').value);
+            meatNumber: { x: 565, y: 119
