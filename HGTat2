@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Text Overlay</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        canvas { border: 1px solid #000; }
+        .debug-controls { margin: 20px; display: none; }
+        .controls { margin: 20px; }
+        input, button { margin: 5px; }
+        .control-group { margin-bottom: 15px; }
+        label { display: inline-block; width: 120px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h1>Hellgate Meat Tattoo Generator</h1>
+    <canvas id="canvas" width="1024" height="1024"></canvas>
+    
+    <div class="controls">
+        <div class="control-group">
+            <label>Foreword:</label>
+            <input type="text" id="forewordInput" placeholder="Enter foreword" value="PRE">
+        </div>
+        <div class="control-group">
+            <label>MEAT Number:</label>
+            <input type="text" id="meatNumberInput" placeholder="Enter MEAT number" value="X1000">
+        </div>
+        <div class="control-group">
+            <label>End Word:</label>
+            <input type="text" id="endWordInput" placeholder="Enter end word" value="POST">
+        </div>
+        <button onclick="overlayText()">Overlay Text</button>
+        <button onclick="downloadImage()">Download Image</button>
+    </div>
+
+    <div class="debug-controls" id="debugControls">
+        <h3>Debug Mode</h3>
+        <h4>Foreword Settings</h4>
+        <label>X Position: <input type="range" id="forewordXPos" min="0" max="1024" value="100" oninput="updateText()"></label><br>
+        <label>Y Position: <input type="range" id="forewordYPos" min="0" max="1024" value="100" oninput="updateText()"></label><br>
+        <label>Font Size: <input type="range" id="forewordFontSize" min="10" max="100" value="40" oninput="updateText()"></label><br>
+        
+        <h4>MEAT Number Settings</h4>
+        <label>X Position: <input type="range" id="meatNumberXPos" min="0" max="1024" value="565" oninput="updateText()"></label><br>
+        <label>Y Position: <input type="range" id="meatNumberYPos" min="0" max="1024" value="119" oninput="updateText()"></label><br>
+        <label>Font Size: <input type="range" id="meatNumberFontSize" min="10" max="100" value="29" oninput="updateText()"></label><br>
+        
+        <h4>End Word Settings</h4>
+        <label>X Position: <input type="range" id="endWordXPos" min="0" max="1024" value="100" oninput="updateText()"></label><br>
+        <label>Y Position: <input type="range" id="endWordYPos" min="0" max="1024" value="100" oninput="updateText()"></label><br>
+        <label>Font Size: <input type="range" id="endWordFontSize" min="10" max="100" value="40" oninput="updateText()"></label><br>
+        
+        <label>Global Opacity: <input type="range" id="globalOpacity" min="0" max="1" step="0.1" value="0.7" oninput="updateText()"></label><br>
+        <p>Current Settings: <code id="settingsOutput"></code></p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let image = new Image();
+        let textSettings = {
+            foreword: { x: 100, y: 100, fontSize: 40, color: '#000000', text: 'PRE' },
+            meatNumber: { x: 565, y: 119, fontSize: 29, color: '#000000', text: 'X1000' },
+            endWord: { x: 100, y: 100, fontSize: 40, color: '#000000', text: 'POST' },
+            globalOpacity: 0.7
+        };
+
+        // Check for debug mode in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const isDebug = urlParams.get('debug') === 'true';
+        if (isDebug) {
+            document.getElementById('debugControls').style.display = 'block';
+            document.getElementById('forewordXPos').value = textSettings.foreword.x;
+            document.getElementById('forewordYPos').value = textSettings.foreword.y;
+            document.getElementById('forewordFontSize').value = textSettings.foreword.fontSize;
+            document.getElementById('meatNumberXPos').value = textSettings.meatNumber.x;
+            document.getElementById('meatNumberYPos').value = textSettings.meatNumber.y;
+            document.getElementById('meatNumberFontSize').value = textSettings.meatNumber.fontSize;
+            document.getElementById('endWordXPos').value = textSettings.endWord.x;
+            document.getElementById('endWordYPos').value = textSettings.endWord.y;
+            document.getElementById('endWordFontSize').value = textSettings.endWord.fontSize;
+            document.getElementById('globalOpacity').value = textSettings.globalOpacity;
+        }
+
+        // Load the fixed template image
+        image.src = 'template.png';
+        image.onload = () => {
+            if (image.width === 1024 && image.height === 1024) {
+                drawCanvas();
+            } else {
+                alert('Template image must be 1024x1024 pixels.');
+            }
+        };
+        image.onerror = () => {
+            alert('Failed to load template image. Ensure template.png exists on the server.');
+        };
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.globalAlpha = textSettings.globalOpacity;
+            ctx.drawImage(image, 0, 0);
+            
+            // Draw Foreword
+            ctx.font = `${textSettings.foreword.fontSize}px Gunplay`;
+            ctx.fillStyle = textSettings.foreword.color;
+            ctx.fillText(textSettings.foreword.text, textSettings.foreword.x, textSettings.foreword.y);
+            
+            // Draw MEAT Number
+            ctx.font = `${textSettings.meatNumber.fontSize}px Gunplay`;
+            ctx.fillStyle = textSettings.meatNumber.color;
+            ctx.fillText(textSettings.meatNumber.text, textSettings.meatNumber.x, textSettings.meatNumber.y);
+            
+            // Draw End Word
+            ctx.font = `${textSettings.endWord.fontSize}px Gunplay`;
+            ctx.fillStyle = textSettings.endWord.color;
+            ctx.fillText(textSettings.endWord.text, textSettings.endWord.x, textSettings.endWord.y);
+            
+            ctx.globalAlpha = 1.0;
+        }
+
+        function overlayText() {
+            textSettings.foreword.text = document.getElementById('forewordInput').value || 'PRE';
+            textSettings.meatNumber.text = document.getElementById('meatNumberInput').value || 'X1000';
+            textSettings.endWord.text = document.getElementById('endWordInput').value || 'POST';
+            textSettings.foreword.color = '#000000';
+            textSettings.meatNumber.color = '#000000';
+            textSettings.endWord.color = '#000000';
+            drawCanvas();
+        }
+
+        function updateText() {
+            if (isDebug) {
+                textSettings.foreword.x = parseInt(document.getElementById('forewordXPos').value);
+                textSettings.foreword.y = parseInt(document.getElementById('forewordYPos').value);
+                textSettings.foreword.fontSize = parseInt(document.getElementById('forewordFontSize').value);
+                textSettings.meatNumber.x = parseInt(document.getElementById('meatNumberXPos').value);
+                textSettings.meatNumber.y = parseInt(document.getElementById('meatNumberYPos').value);
+                textSettings.meatNumber.fontSize = parseInt(document.getElementById('meatNumberFontSize').value);
+                textSettings.endWord.x = parseInt(document.getElementById('endWordXPos').value);
+                textSettings.endWord.y = parseInt(document.getElementById('endWordYPos').value);
+                textSettings.endWord.fontSize = parseInt(document.getElementById('endWordFontSize').value);
+                textSettings.globalOpacity = parseFloat(document.getElementById('globalOpacity').value);
+                textSettings.foreword.text = document.getElementById('forewordInput').value || 'PRE';
+                textSettings.meatNumber.text = document.getElementById('meatNumberInput').value || 'X1000';
+                textSettings.endWord.text = document.getElementById('endWordInput').value || 'POST';
+                drawCanvas();
+                document.getElementById('settingsOutput').textContent = 
+                    `Foreword: x: ${textSettings.foreword.x}, y: ${textSettings.foreword.y}, fontSize: ${textSettings.foreword.fontSize}\n` +
+                    `MEAT Number: x: ${textSettings.meatNumber.x}, y: ${textSettings.meatNumber.y}, fontSize: ${textSettings.meatNumber.fontSize}\n` +
+                    `End Word: x: ${textSettings.endWord.x}, y: ${textSettings.endWord.y}, fontSize: ${textSettings.endWord.fontSize}\n` +
+                    `Global Opacity: ${textSettings.globalOpacity}`;
+            }
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'image_with_text.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
