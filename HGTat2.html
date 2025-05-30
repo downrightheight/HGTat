@@ -102,17 +102,23 @@
             ctx.globalAlpha = textSettings.globalOpacity;
             ctx.drawImage(image, 0, 0);
             
-            // Draw Foreword
+            // Draw Foreword (centered)
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
             ctx.font = `${textSettings.foreword.fontSize}px Gunplay`;
             ctx.fillStyle = textSettings.foreword.color;
             ctx.fillText(textSettings.foreword.text, textSettings.foreword.x, textSettings.foreword.y);
             
-            // Draw MEAT Number
+            // Draw MEAT Number (left-aligned, as original)
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
             ctx.font = `${textSettings.meatNumber.fontSize}px Gunplay`;
             ctx.fillStyle = textSettings.meatNumber.color;
             ctx.fillText(textSettings.meatNumber.text, textSettings.meatNumber.x, textSettings.meatNumber.y);
             
-            // Draw End Word
+            // Draw End Word (centered)
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
             ctx.font = `${textSettings.endWord.fontSize}px Gunplay`;
             ctx.fillStyle = textSettings.endWord.color;
             ctx.fillText(textSettings.endWord.text, textSettings.endWord.x, textSettings.endWord.y);
